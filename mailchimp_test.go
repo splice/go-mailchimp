@@ -41,7 +41,7 @@ func TestSubscribeError(t *testing.T) {
 
 	client, _ := NewClient("a-lit11", &http.Client{Transport: transport})
 	client.BaseURL, _ = url.Parse("http://localhost/")
-	_, err := client.Subscribe("me@matthewbrown.io", "abc_test")
+	_, err := client.Subscribe("john@doe.com", "abc_test")
 	if err == nil {
 		t.Fatal(err)
 	}
@@ -52,7 +52,12 @@ func TestSubscribe(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(200)
 		rw.Header().Set("Content-Type", "application/json")
-		fmt.Fprintln(rw, `{"email":"bob@example.com","status":"sent","reject_reason":"hard-bounce","_id":"1"}`)
+		fmt.Fprintln(rw, `{
+			"email": "bob@example.com",
+			"status": "sent",
+			"reject_reason": "hard-bounce",
+			"_id": "1"
+		}`)
 	}))
 	defer server.Close()
 
@@ -64,7 +69,7 @@ func TestSubscribe(t *testing.T) {
 
 	client, _ := NewClient("a-lit11", &http.Client{Transport: transport})
 	client.BaseURL, _ = url.Parse("http://localhost/")
-	_, err := client.Subscribe("me@matthewbrown.io", "abc_test")
+	_, err := client.Subscribe("john@doe.com", "abc_test")
 	if err != nil {
 		t.Fatal(err)
 	}
