@@ -15,28 +15,9 @@ import (
 // Client manages communication with the Mailchimp API.
 type Client struct {
 	client  *http.Client
-	BaseURL *url.URL
-	DC      string
-	APIKey  string
-}
-
-// NewClient returns a new Mailchimp API client.  If a nil httpClient is
-// provided, http.DefaultClient will be used. The apiKey must be in the format xyz-us11.
-func NewClient(apiKey string, httpClient *http.Client) (*Client, error) {
-	if len(strings.Split(apiKey, "-")) != 2 {
-		return nil, errors.New("Mailchimp API Key must be formatted like: xyz-zys")
-	}
-	dc := strings.Split(apiKey, "-")[1] // data center
-	if httpClient == nil {
-		httpClient = http.DefaultClient
-	}
-	baseURL, _ := url.Parse(fmt.Sprintf("https://%s.api.mailchimp.com/3.0", dc))
-	return &Client{
-		APIKey:  apiKey,
-		client:  httpClient,
-		DC:      dc,
-		BaseURL: baseURL,
-	}, nil
+	baseURL *url.URL
+	dc      string
+	apiKey  string
 }
 
 // ErrorResponse ...
@@ -50,6 +31,38 @@ type ErrorResponse struct {
 // Error ...
 func (e ErrorResponse) Error() string {
 	return fmt.Sprintf("Error %d %s (%s)", e.Status, e.Title, e.Detail)
+}
+
+// NewClient returns a new Mailchimp API client.  If a nil httpClient is
+// provided, http.DefaultClient will be used. The apiKey must be in the format xyz-us11.
+func NewClient(apiKey string, httpClient *http.Client) (ClientInterface, error) {
+	if len(strings.Split(apiKey, "-")) != 2 {
+		return nil, errors.New("Mailchimp API Key must be formatted like: xyz-zys")
+	}
+	dc := strings.Split(apiKey, "-")[1] // data center
+	if httpClient == nil {
+		httpClient = http.DefaultClient
+	}
+	baseURL, err := url.Parse(fmt.Sprintf("https://%s.api.mailchimp.com/3.0", dc))
+	if err != nil {
+		return nil, err
+	}
+	return &Client{
+		client:  httpClient,
+		baseURL: baseURL,
+		apiKey:  apiKey,
+		dc:      dc,
+	}, nil
+}
+
+// GetBaseURL ...
+func (c *Client) GetBaseURL() *url.URL {
+	return c.baseURL
+}
+
+// SetBaseURL ...
+func (c *Client) SetBaseURL(baseURL *url.URL) {
+	c.baseURL = baseURL
 }
 
 // Subscribe ...
@@ -75,13 +88,13 @@ func (c *Client) do(method string, path string, body interface{}) (interface{}, 
 		}
 	}
 
-	apiURL := fmt.Sprintf("%s%s", c.BaseURL.String(), path)
+	apiURL := fmt.Sprintf("%s%s", c.GetBaseURL(), path)
 
 	req, err := http.NewRequest(method, apiURL, buf)
 	if err != nil {
 		return nil, err
 	}
-	req.SetBasicAuth("", c.APIKey)
+	req.SetBasicAuth("", c.apiKey)
 
 	resp, err := c.client.Do(req)
 	if err != nil {

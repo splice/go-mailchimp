@@ -5,26 +5,23 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func equals(t *testing.T, a interface{}, b interface{}) {
-	if a != b {
-		t.Errorf("Expected %v (type %v) - Got %v (type %v)", b, reflect.TypeOf(b), a, reflect.TypeOf(a))
-	}
-}
-
 func TestBadAPIKey(t *testing.T) {
-	_, err := NewClient("asz", nil)
-	if err == nil {
-		t.Fail()
-	}
+	client, err := NewClient("asz", nil)
+	assert.Nil(t, client)
+	assert.Error(t, err)
 }
 
 func TestURL(t *testing.T) {
-	client, _ := NewClient("a-lit11", nil)
-	equals(t, "https://lit11.api.mailchimp.com/3.0", client.BaseURL.String())
+	client, err := NewClient("a-lit11", nil)
+	assert.NoError(t, err)
+
+	expected, _ := url.Parse("https://lit11.api.mailchimp.com/3.0")
+	assert.Equal(t, expected, client.GetBaseURL())
 }
 
 func TestSubscribeError(t *testing.T) {
@@ -39,13 +36,14 @@ func TestSubscribeError(t *testing.T) {
 		},
 	}
 
-	client, _ := NewClient("a-lit11", &http.Client{Transport: transport})
-	client.BaseURL, _ = url.Parse("http://localhost/")
-	_, err := client.Subscribe("john@doe.com", "abc_test")
-	if err == nil {
-		t.Fatal(err)
-	}
-	equals(t, err.Error(), "Error 0  ()")
+	client, err := NewClient("a-lit11", &http.Client{Transport: transport})
+	assert.NoError(t, err)
+
+	baseURL, _ := url.Parse("http://localhost/")
+	client.SetBaseURL(baseURL)
+
+	_, err = client.Subscribe("john@doe.com", "abc_test")
+	assert.Equal(t, "Error 0  ()", err.Error())
 }
 
 func TestSubscribe(t *testing.T) {
@@ -67,10 +65,12 @@ func TestSubscribe(t *testing.T) {
 		},
 	}
 
-	client, _ := NewClient("a-lit11", &http.Client{Transport: transport})
-	client.BaseURL, _ = url.Parse("http://localhost/")
-	_, err := client.Subscribe("john@doe.com", "abc_test")
-	if err != nil {
-		t.Fatal(err)
-	}
+	client, err := NewClient("a-lit11", &http.Client{Transport: transport})
+	assert.NoError(t, err)
+
+	baseURL, _ := url.Parse("http://localhost/")
+	client.SetBaseURL(baseURL)
+
+	_, err = client.Subscribe("john@doe.com", "abc_test")
+	assert.NoError(t, err)
 }
