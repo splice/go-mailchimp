@@ -52,21 +52,20 @@ func (e ErrorResponse) Error() string {
 	return fmt.Sprintf("Error %d %s (%s)", e.Status, e.Title, e.Detail)
 }
 
-// CheckResponse ...
-func CheckResponse(r *http.Response) error {
-	if c := r.StatusCode; 200 <= c && c <= 299 {
-		return nil
+// Subscribe ...
+func (c *Client) Subscribe(email string, listID string) (interface{}, error) {
+	data := &map[string]string{
+		"email_address": email,
+		"status":        "subscribed",
 	}
-	errorResponse := new(ErrorResponse)
-	data, err := ioutil.ReadAll(r.Body)
-	if err == nil && data != nil {
-		json.Unmarshal(data, errorResponse)
-	}
-	return errorResponse
+	return c.do(
+		"POST",
+		fmt.Sprintf("/lists/%s/members/", listID),
+		data,
+	)
 }
 
-// Do ...
-func (c *Client) Do(method string, path string, body interface{}) (interface{}, error) {
+func (c *Client) do(method string, path string, body interface{}) (interface{}, error) {
 	var buf io.ReadWriter
 	if body != nil {
 		buf = new(bytes.Buffer)
@@ -90,8 +89,7 @@ func (c *Client) Do(method string, path string, body interface{}) (interface{}, 
 	}
 	defer resp.Body.Close()
 
-	err = CheckResponse(resp)
-	if err != nil {
+	if err := checkResponse(resp); err != nil {
 		return nil, err
 	}
 
@@ -103,15 +101,14 @@ func (c *Client) Do(method string, path string, body interface{}) (interface{}, 
 	return v, nil
 }
 
-// Subscribe ...
-func (c *Client) Subscribe(email string, listID string) (interface{}, error) {
-	data := &map[string]string{
-		"email_address": email,
-		"status":        "subscribed",
+func checkResponse(r *http.Response) error {
+	if c := r.StatusCode; 200 <= c && c <= 299 {
+		return nil
 	}
-	return c.Do(
-		"POST",
-		fmt.Sprintf("/lists/%s/members/", listID),
-		data,
-	)
+	errorResponse := new(ErrorResponse)
+	data, err := ioutil.ReadAll(r.Body)
+	if err == nil && data != nil {
+		json.Unmarshal(data, errorResponse)
+	}
+	return errorResponse
 }
