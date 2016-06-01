@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-// A Client manages communication with the Mailchimp API.
+// Client manages communication with the Mailchimp API.
 type Client struct {
 	client  *http.Client
 	BaseURL *url.URL
@@ -26,30 +26,38 @@ func NewClient(apiKey string, httpClient *http.Client) (*Client, error) {
 	if len(strings.Split(apiKey, "-")) != 2 {
 		return nil, errors.New("Mailchimp API Key must be formatted like: xyz-zys")
 	}
-	dc := strings.Split(apiKey, "-")[1]
+	dc := strings.Split(apiKey, "-")[1] // data center
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
-	baseUrl, _ := url.Parse(fmt.Sprintf("https://%s.api.mailchimp.com/3.0", dc))
-	return &Client{APIKey: apiKey, client: httpClient, DC: dc, BaseURL: baseUrl}, nil
+	baseURL, _ := url.Parse(fmt.Sprintf("https://%s.api.mailchimp.com/3.0", dc))
+	return &Client{
+		APIKey:  apiKey,
+		client:  httpClient,
+		DC:      dc,
+		BaseURL: baseURL,
+	}, nil
 }
 
+// ErrorResponse ...
 type ErrorResponse struct {
-	Type   string `json:type"`
+	Type   string `json:"type"`
 	Title  string `json:"title"`
 	Status int    `json:"status"`
 	Detail string `json:"detail"`
 }
 
+// Error ...
 func (e ErrorResponse) Error() string {
 	return fmt.Sprintf("Error %d %s (%s)", e.Status, e.Title, e.Detail)
 }
 
+// CheckResponse ...
 func CheckResponse(r *http.Response) error {
 	if c := r.StatusCode; 200 <= c && c <= 299 {
 		return nil
 	}
-	errorResponse := &ErrorResponse{}
+	errorResponse := new(ErrorResponse)
 	data, err := ioutil.ReadAll(r.Body)
 	if err == nil && data != nil {
 		json.Unmarshal(data, errorResponse)
@@ -57,6 +65,7 @@ func CheckResponse(r *http.Response) error {
 	return errorResponse
 }
 
+// Do ...
 func (c *Client) Do(method string, path string, body interface{}) (interface{}, error) {
 	var buf io.ReadWriter
 	if body != nil {
@@ -94,10 +103,15 @@ func (c *Client) Do(method string, path string, body interface{}) (interface{}, 
 	return v, nil
 }
 
-func (c *Client) Subscribe(email string, listId string) (interface{}, error) {
-	v, err := c.Do("POST", fmt.Sprintf("/lists/%s/members/", listId), &map[string]string{"email_address": email, "status": "subscribed"})
-	if err != nil {
-		return v, err
+// Subscribe ...
+func (c *Client) Subscribe(email string, listID string) (interface{}, error) {
+	data := &map[string]string{
+		"email_address": email,
+		"status":        "subscribed",
 	}
-	return v, nil
+	return c.Do(
+		"POST",
+		fmt.Sprintf("/lists/%s/members/", listID),
+		data,
+	)
 }
