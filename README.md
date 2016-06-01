@@ -1,3 +1,5 @@
+[![Codeship Status for AreaHQ/mailchimp](https://codeship.com/projects/7252c9a0-09f0-0134-e361-2adbeb910e90/status?branch=master)](https://codeship.com/projects/155402)
+
 # Mailchimp
 
 A golang SDK for Mailchimp API v3.
