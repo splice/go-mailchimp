@@ -1,6 +1,8 @@
 package mailchimp
 
 import (
+	"net/url"
+
 	"github.com/stretchr/testify/mock"
 )
 
@@ -30,4 +32,25 @@ func (_m *ClientMock) Subscribe(email string, listID string) (interface{}, error
 	}
 
 	return r0, r1
+}
+
+// SetBaseURL ...
+func (_m *ClientMock) SetBaseURL(baseURL *url.URL) {
+	_m.Called(baseURL)
+}
+
+// GetBaseURL ...
+func (_m *ClientMock) GetBaseURL() *url.URL {
+	ret := _m.Called()
+
+	var r0 *url.URL
+	if rf, ok := ret.Get(0).(func() *url.URL); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*url.URL)
+		}
+	}
+
+	return r0
 }
