@@ -16,10 +16,35 @@ import (
 )
 
 func main() {
-  client := mailchimp.NewClient("apixyc-us11", nil)
-  _, err := client.Subscribe("john@doe.com", "listidxyz")
+  client, err := mailchimp.NewClient("the_api_key-us13", nil)
   if err != nil {
     log.Fatal(err)
   }
+
+  memberResponse, err := client.CheckSubscription("john@reese.com", "list_id")
+	if err != nil {
+    errResponse, ok := err.(*mailchimp.ErrorResponse)
+    if !ok {
+      log.Fatal(err)
+    }
+    // errResponse.Type
+    // errResponse.Title
+    // errResponse.Status
+    // errResponse.Detail
+		log.Fatal(errResponse)
+	}
+
+  memberResponse, err = client.Subscribe("john@reese.com", "list_id")
+  if err != nil {
+    errResponse, ok := err.(*mailchimp.ErrorResponse)
+    if !ok {
+      log.Fatal(err)
+    }
+    // errResponse.Type
+    // errResponse.Title
+    // errResponse.Status
+    // errResponse.Detail
+		log.Fatal(errResponse)
+	}
 }
 ```
