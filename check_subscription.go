@@ -4,16 +4,13 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 )
 
 // CheckSubscription ...
 func (c *Client) CheckSubscription(email string, listID string) (*MemberResponse, error) {
 	// Hash email
-	h := md5.New()
-	io.WriteString(h, email)
-	emailMD5 := fmt.Sprintf("%s", h.Sum(nil))
+	emailMD5 := fmt.Sprintf("%x", md5.Sum([]byte(email)))
 	// Make request
 	resp, err := c.do(
 		"GET",
