@@ -34,7 +34,7 @@ func main() {
 		log.Fatal(errResponse)
 	}
 
-  memberResponse, err = client.Subscribe("john@reese.com", "list_id")
+  memberResponse, err = client.Subscribe("john@reese.com", "list_id", map[string]interface{}{})
   if err != nil {
     errResponse, ok := err.(*mailchimp.ErrorResponse)
     if !ok {
