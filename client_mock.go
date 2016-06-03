@@ -12,15 +12,15 @@ type ClientMock struct {
 }
 
 // Subscribe ...
-func (_m *ClientMock) Subscribe(email string, listID string) (interface{}, error) {
+func (_m *ClientMock) Subscribe(email string, listID string) (*MemberResponse, error) {
 	ret := _m.Called(email, listID)
 
-	var r0 interface{}
-	if rf, ok := ret.Get(0).(func(string, string) interface{}); ok {
+	var r0 *MemberResponse
+	if rf, ok := ret.Get(0).(func(string, string) *MemberResponse); ok {
 		r0 = rf(email, listID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(interface{})
+			r0 = ret.Get(0).(*MemberResponse)
 		}
 	}
 

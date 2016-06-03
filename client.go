@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/AreaHQ/mailchimp/status"
 )
 
 // Client manages communication with the Mailchimp API.
@@ -66,19 +68,46 @@ func (c *Client) SetBaseURL(baseURL *url.URL) {
 }
 
 // Subscribe ...
-func (c *Client) Subscribe(email string, listID string) (interface{}, error) {
-	data := &map[string]string{
-		"email_address": email,
-		"status":        "subscribed",
-	}
-	return c.do(
+func (c *Client) Subscribe(email string, listID string) (*MemberResponse, error) {
+	// Make request
+	resp, err := c.do(
 		"POST",
 		fmt.Sprintf("/lists/%s/members/", listID),
-		data,
+		&map[string]string{
+			"email_address": email,
+			"status":        status.Subscribed,
+		},
 	)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	// log.Print(string(data))
+
+	// If the request failed
+	if resp.StatusCode > 299 {
+		errorResponse, err := extractError(data)
+		if err != nil {
+			return nil, err
+		}
+		return nil, errorResponse
+	}
+
+	// Unmarshal response into MemberResponse struct
+	memberResponse := new(MemberResponse)
+	if err := json.Unmarshal(data, memberResponse); err != nil {
+		return nil, err
+	}
+	return memberResponse, nil
 }
 
-func (c *Client) do(method string, path string, body interface{}) (interface{}, error) {
+func (c *Client) do(method string, path string, body interface{}) (*http.Response, error) {
 	var buf io.ReadWriter
 	if body != nil {
 		buf = new(bytes.Buffer)
@@ -96,32 +125,13 @@ func (c *Client) do(method string, path string, body interface{}) (interface{}, 
 	}
 	req.SetBasicAuth("", c.apiKey)
 
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if err := checkResponse(resp); err != nil {
-		return nil, err
-	}
-
-	var v interface{}
-	err = json.NewDecoder(resp.Body).Decode(&v)
-	if err != nil {
-		return nil, err
-	}
-	return v, nil
+	return c.client.Do(req)
 }
 
-func checkResponse(r *http.Response) error {
-	if c := r.StatusCode; 200 <= c && c <= 299 {
-		return nil
-	}
+func extractError(data []byte) (*ErrorResponse, error) {
 	errorResponse := new(ErrorResponse)
-	data, err := ioutil.ReadAll(r.Body)
-	if err == nil && data != nil {
-		json.Unmarshal(data, errorResponse)
+	if err := json.Unmarshal(data, errorResponse); err != nil {
+		return nil, err
 	}
-	return errorResponse
+	return errorResponse, nil
 }
