@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var errorResponse = `{
+var alreadySubscribedErrorResponse = `{
     "type": "http://developer.mailchimp.com/documentation/mailchimp/guides/error-glossary/",
     "title": "Member Exists",
     "status": 400,
@@ -23,7 +23,7 @@ func TestSubscribeError(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(400)
 		rw.Header().Set("Content-Type", "application/json")
-		fmt.Fprint(rw, errorResponse)
+		fmt.Fprint(rw, alreadySubscribedErrorResponse)
 	}))
 	defer server.Close()
 
@@ -33,13 +33,13 @@ func TestSubscribeError(t *testing.T) {
 		},
 	}
 
-	client, err := NewClient("a-lit11", &http.Client{Transport: transport})
+	client, err := NewClient("the_api_key-us13", &http.Client{Transport: transport})
 	assert.NoError(t, err)
 
 	baseURL, _ := url.Parse("http://localhost/")
 	client.SetBaseURL(baseURL)
 
-	memberResponse, err := client.Subscribe("john@reese.com", "abc_test")
+	memberResponse, err := client.Subscribe("john@reese.com", "list_id")
 	assert.Nil(t, memberResponse)
 	assert.Equal(t, "Error 400 Member Exists ( is already a list member. Use PUT to insert or update list members.)", err.Error())
 
@@ -62,13 +62,13 @@ func TestSubscribeMalformedError(t *testing.T) {
 		},
 	}
 
-	client, err := NewClient("a-lit11", &http.Client{Transport: transport})
+	client, err := NewClient("the_api_key-us13", &http.Client{Transport: transport})
 	assert.NoError(t, err)
 
 	baseURL, _ := url.Parse("http://localhost/")
 	client.SetBaseURL(baseURL)
 
-	memberResponse, err := client.Subscribe("john@reese.com", "abc_test")
+	memberResponse, err := client.Subscribe("john@reese.com", "list_id")
 	assert.Nil(t, memberResponse)
 	assert.Equal(t, "unexpected end of JSON input", err.Error())
 }
@@ -174,13 +174,13 @@ func TestSubscribe(t *testing.T) {
 		},
 	}
 
-	client, err := NewClient("a-lit11", &http.Client{Transport: transport})
+	client, err := NewClient("the_api_key-us13", &http.Client{Transport: transport})
 	assert.NoError(t, err)
 
 	baseURL, _ := url.Parse("http://localhost/")
 	client.SetBaseURL(baseURL)
 
-	memberResponse, err := client.Subscribe("john@reese.com", "abc_test")
+	memberResponse, err := client.Subscribe("john@reese.com", "list_id")
 	assert.NoError(t, err)
 
 	assert.Equal(t, "11bf13d1eb58116eba1de370b2bd796b", memberResponse.ID)
