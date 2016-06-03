@@ -35,12 +35,12 @@ func (_m *ClientMock) CheckSubscription(email string, listID string) (*MemberRes
 }
 
 // Subscribe ...
-func (_m *ClientMock) Subscribe(email string, listID string) (*MemberResponse, error) {
-	ret := _m.Called(email, listID)
+func (_m *ClientMock) Subscribe(email string, listID string, mergeFields map[string]interface{}) (*MemberResponse, error) {
+	ret := _m.Called(email, listID, mergeFields)
 
 	var r0 *MemberResponse
-	if rf, ok := ret.Get(0).(func(string, string) *MemberResponse); ok {
-		r0 = rf(email, listID)
+	if rf, ok := ret.Get(0).(func(string, string, map[string]interface{}) *MemberResponse); ok {
+		r0 = rf(email, listID, mergeFields)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*MemberResponse)
@@ -48,8 +48,8 @@ func (_m *ClientMock) Subscribe(email string, listID string) (*MemberResponse, e
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string, string) error); ok {
-		r1 = rf(email, listID)
+	if rf, ok := ret.Get(1).(func(string, string, map[string]interface{}) error); ok {
+		r1 = rf(email, listID, mergeFields)
 	} else {
 		r1 = ret.Error(1)
 	}

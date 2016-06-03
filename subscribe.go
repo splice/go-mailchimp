@@ -9,15 +9,17 @@ import (
 )
 
 // Subscribe ...
-func (c *Client) Subscribe(email string, listID string) (*MemberResponse, error) {
+func (c *Client) Subscribe(email string, listID string, mergeFields map[string]interface{}) (*MemberResponse, error) {
 	// Make request
+	params := map[string]interface{}{
+		"email_address": email,
+		"status":        status.Subscribed,
+		"merge_fields":  mergeFields,
+	}
 	resp, err := c.do(
 		"POST",
 		fmt.Sprintf("/lists/%s/members/", listID),
-		&map[string]string{
-			"email_address": email,
-			"status":        status.Subscribed,
-		},
+		&params,
 	)
 	if err != nil {
 		return nil, err

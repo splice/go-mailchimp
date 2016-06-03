@@ -38,7 +38,7 @@ func TestCheckSubscriptionNotFoundError(t *testing.T) {
 	baseURL, _ := url.Parse("http://localhost/")
 	client.SetBaseURL(baseURL)
 
-	memberResponse, err := client.Subscribe("john@reese.com", "list_id")
+	memberResponse, err := client.CheckSubscription("john@reese.com", "list_id")
 	assert.Nil(t, memberResponse)
 	assert.Equal(t, "Error 404 Resource Not Found (The requested resource could not be found.)", err.Error())
 

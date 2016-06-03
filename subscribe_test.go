@@ -39,7 +39,7 @@ func TestSubscribeError(t *testing.T) {
 	baseURL, _ := url.Parse("http://localhost/")
 	client.SetBaseURL(baseURL)
 
-	memberResponse, err := client.Subscribe("john@reese.com", "list_id")
+	memberResponse, err := client.Subscribe("john@reese.com", "list_id", map[string]interface{}{})
 	assert.Nil(t, memberResponse)
 	assert.Equal(t, "Error 400 Member Exists ( is already a list member. Use PUT to insert or update list members.)", err.Error())
 
@@ -68,7 +68,7 @@ func TestSubscribeMalformedError(t *testing.T) {
 	baseURL, _ := url.Parse("http://localhost/")
 	client.SetBaseURL(baseURL)
 
-	memberResponse, err := client.Subscribe("john@reese.com", "list_id")
+	memberResponse, err := client.Subscribe("john@reese.com", "list_id", map[string]interface{}{})
 	assert.Nil(t, memberResponse)
 	assert.Equal(t, "unexpected end of JSON input", err.Error())
 }
@@ -180,7 +180,7 @@ func TestSubscribe(t *testing.T) {
 	baseURL, _ := url.Parse("http://localhost/")
 	client.SetBaseURL(baseURL)
 
-	memberResponse, err := client.Subscribe("john@reese.com", "list_id")
+	memberResponse, err := client.Subscribe("john@reese.com", "list_id", map[string]interface{}{})
 	assert.NoError(t, err)
 
 	assert.Equal(t, "11bf13d1eb58116eba1de370b2bd796b", memberResponse.ID)
