@@ -22,7 +22,7 @@ func main() {
   }
 
   memberResponse, err := client.CheckSubscription("john@reese.com", "list_id")
-	if err != nil {
+  if err != nil {
     errResponse, ok := err.(*mailchimp.ErrorResponse)
     if !ok {
       log.Fatal(err)
@@ -31,8 +31,8 @@ func main() {
     // errResponse.Title
     // errResponse.Status
     // errResponse.Detail
-		log.Fatal(errResponse)
-	}
+    log.Fatal(errResponse)
+  }
 
   memberResponse, err = client.Subscribe("john@reese.com", "list_id", map[string]interface{}{})
   if err != nil {
@@ -44,7 +44,7 @@ func main() {
     // errResponse.Title
     // errResponse.Status
     // errResponse.Detail
-		log.Fatal(errResponse)
-	}
+    og.Fatal(errResponse)
+  }
 }
 ```
