@@ -9,7 +9,7 @@ import (
 )
 
 // Subscribe ...
-func (c *Client) Subscribe(email string, listID string, mergeFields map[string]interface{}) (*MemberResponse, error) {
+func (c *Client) Subscribe(listID string, email string, mergeFields map[string]interface{}) (*MemberResponse, error) {
 	// Make request
 	params := map[string]interface{}{
 		"email_address": email,
@@ -32,19 +32,20 @@ func (c *Client) Subscribe(email string, listID string, mergeFields map[string]i
 		return nil, err
 	}
 
-	// If the request failed
-	if resp.StatusCode > 299 {
-		errorResponse, err := extractError(data)
-		if err != nil {
+	// Allow any success status (2xx)
+	if resp.StatusCode/100 == 2 {
+		// Unmarshal response into MemberResponse struct
+		memberResponse := new(MemberResponse)
+		if err := json.Unmarshal(data, memberResponse); err != nil {
 			return nil, err
 		}
-		return nil, errorResponse
+		return memberResponse, nil
 	}
 
-	// Unmarshal response into MemberResponse struct
-	memberResponse := new(MemberResponse)
-	if err := json.Unmarshal(data, memberResponse); err != nil {
+	// Request failed
+	errorResponse, err := extractError(data)
+	if err != nil {
 		return nil, err
 	}
-	return memberResponse, nil
+	return nil, errorResponse
 }

@@ -5,17 +5,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+
+	"github.com/AreaHQ/mailchimp/status"
 )
 
-// CheckSubscription ...
-func (c *Client) CheckSubscription(listID string, email string) (*MemberResponse, error) {
+// UpdateSubscription ...
+func (c *Client) UpdateSubscription(listID string, email string, mergeFields map[string]interface{}) (*MemberResponse, error) {
 	// Hash email
 	emailMD5 := fmt.Sprintf("%x", md5.Sum([]byte(email)))
 	// Make request
+	params := map[string]interface{}{
+		"email_address": email,
+		"status":        status.Subscribed,
+		"merge_fields":  mergeFields,
+	}
 	resp, err := c.do(
-		"GET",
+		"PUT",
 		fmt.Sprintf("/lists/%s/members/%s", listID, emailMD5),
-		nil,
+		&params,
 	)
 	if err != nil {
 		return nil, err

@@ -11,11 +11,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSubscribeError(t *testing.T) {
+func TestUpdateSubscriptionError(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(400)
 		rw.Header().Set("Content-Type", "application/json")
-		fmt.Fprint(rw, alreadySubscribedErrorResponse)
+		fmt.Fprint(rw, invalidMergeFieldsErrorResponse)
 	}))
 	defer server.Close()
 
@@ -33,16 +33,16 @@ func TestSubscribeError(t *testing.T) {
 
 	memberResponse, err := client.Subscribe("list_id", "john@reese.com", map[string]interface{}{})
 	assert.Nil(t, memberResponse)
-	assert.Equal(t, "Error 400 Member Exists ( is already a list member. Use PUT to insert or update list members.)", err.Error())
+	assert.Equal(t, "Error 400 Invalid Resource (Your merge fields were invalid.)", err.Error())
 
 	errResponse, ok := err.(*ErrorResponse)
 	assert.True(t, ok)
-	assert.Equal(t, "Member Exists", errResponse.Title)
+	assert.Equal(t, "Invalid Resource", errResponse.Title)
 	assert.Equal(t, 400, errResponse.Status)
-	assert.Equal(t, " is already a list member. Use PUT to insert or update list members.", errResponse.Detail)
+	assert.Equal(t, "Your merge fields were invalid.", errResponse.Detail)
 }
 
-func TestSubscribeMalformedError(t *testing.T) {
+func TestUpdateSubscriptionMalformedError(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(500)
 	}))
@@ -60,12 +60,12 @@ func TestSubscribeMalformedError(t *testing.T) {
 	baseURL, _ := url.Parse("http://localhost/")
 	client.SetBaseURL(baseURL)
 
-	memberResponse, err := client.Subscribe("list_id", "john@reese.com", map[string]interface{}{})
+	memberResponse, err := client.UpdateSubscription("list_id", "john@reese.com", map[string]interface{}{})
 	assert.Nil(t, memberResponse)
 	assert.Equal(t, "unexpected end of JSON input", err.Error())
 }
 
-func TestSubscribe(t *testing.T) {
+func TestUpdateSubscription(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(200)
 		rw.Header().Set("Content-Type", "application/json")

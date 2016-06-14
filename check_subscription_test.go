@@ -10,14 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var notFoundErrorResponse = `{
-    "type": "http://developer.mailchimp.com/documentation/mailchimp/guides/error-glossary/",
-    "title": "Resource Not Found",
-    "status": 404,
-    "detail": "The requested resource could not be found.",
-    "instance": ""
-}`
-
 func TestCheckSubscriptionNotFoundError(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(404)
@@ -38,7 +30,7 @@ func TestCheckSubscriptionNotFoundError(t *testing.T) {
 	baseURL, _ := url.Parse("http://localhost/")
 	client.SetBaseURL(baseURL)
 
-	memberResponse, err := client.CheckSubscription("john@reese.com", "list_id")
+	memberResponse, err := client.CheckSubscription("list_id", "john@reese.com")
 	assert.Nil(t, memberResponse)
 	assert.Equal(t, "Error 404 Resource Not Found (The requested resource could not be found.)", err.Error())
 
