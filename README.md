@@ -12,7 +12,7 @@ package main
 import (
   "log"
 
-  "github.com/AreaHQ/mailchimp"
+  mailchimp "github.com/AreaHQ/go-mailchimp"
 )
 
 func main() {
