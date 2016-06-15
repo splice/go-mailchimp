@@ -2,7 +2,7 @@
 
 # Mailchimp
 
-A golang SDK for Mailchimp API v3.
+A Golang SDK for Mailchimp API v3.
 
 ## Usage
 
