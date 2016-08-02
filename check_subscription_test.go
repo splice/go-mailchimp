@@ -1,4 +1,4 @@
-package mailchimp
+package mailchimp_test
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"testing"
 
+	mailchimp "github.com/RichardKnop/go-mailchimp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,7 +25,7 @@ func TestCheckSubscriptionNotFoundError(t *testing.T) {
 		},
 	}
 
-	client, err := NewClient("the_api_key-us13", &http.Client{Transport: transport})
+	client, err := mailchimp.NewClient("the_api_key-us13", &http.Client{Transport: transport})
 	assert.NoError(t, err)
 
 	baseURL, _ := url.Parse("http://localhost/")
@@ -34,7 +35,7 @@ func TestCheckSubscriptionNotFoundError(t *testing.T) {
 	assert.Nil(t, memberResponse)
 	assert.Equal(t, "Error 404 Resource Not Found (The requested resource could not be found.)", err.Error())
 
-	errResponse, ok := err.(*ErrorResponse)
+	errResponse, ok := err.(*mailchimp.ErrorResponse)
 	assert.True(t, ok)
 	assert.Equal(t, "Resource Not Found", errResponse.Title)
 	assert.Equal(t, 404, errResponse.Status)

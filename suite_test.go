@@ -1,4 +1,4 @@
-package mailchimp
+package mailchimp_test
 
 var notFoundErrorResponse = `{
     "type": "http://developer.mailchimp.com/documentation/mailchimp/guides/error-glossary/",

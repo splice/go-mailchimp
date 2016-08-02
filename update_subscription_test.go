@@ -1,4 +1,4 @@
-package mailchimp
+package mailchimp_test
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/AreaHQ/go-mailchimp/status"
+	mailchimp "github.com/RichardKnop/go-mailchimp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,7 +26,7 @@ func TestUpdateSubscriptionError(t *testing.T) {
 		},
 	}
 
-	client, err := NewClient("the_api_key-us13", &http.Client{Transport: transport})
+	client, err := mailchimp.NewClient("the_api_key-us13", &http.Client{Transport: transport})
 	assert.NoError(t, err)
 
 	baseURL, _ := url.Parse("http://localhost/")
@@ -35,7 +36,7 @@ func TestUpdateSubscriptionError(t *testing.T) {
 	assert.Nil(t, memberResponse)
 	assert.Equal(t, "Error 400 Invalid Resource (Your merge fields were invalid.)", err.Error())
 
-	errResponse, ok := err.(*ErrorResponse)
+	errResponse, ok := err.(*mailchimp.ErrorResponse)
 	assert.True(t, ok)
 	assert.Equal(t, "Invalid Resource", errResponse.Title)
 	assert.Equal(t, 400, errResponse.Status)
@@ -54,7 +55,7 @@ func TestUpdateSubscriptionMalformedError(t *testing.T) {
 		},
 	}
 
-	client, err := NewClient("the_api_key-us13", &http.Client{Transport: transport})
+	client, err := mailchimp.NewClient("the_api_key-us13", &http.Client{Transport: transport})
 	assert.NoError(t, err)
 
 	baseURL, _ := url.Parse("http://localhost/")
@@ -79,7 +80,7 @@ func TestUpdateSubscription(t *testing.T) {
 		},
 	}
 
-	client, err := NewClient("the_api_key-us13", &http.Client{Transport: transport})
+	client, err := mailchimp.NewClient("the_api_key-us13", &http.Client{Transport: transport})
 	assert.NoError(t, err)
 
 	baseURL, _ := url.Parse("http://localhost/")
