@@ -1,4 +1,4 @@
-[![Codeship Status for RichardKnop/go-mailchimp](https://codeship.com/projects/7252c9a0-09f0-0134-e361-2adbeb910e90/status?branch=master)](https://codeship.com/projects/155402)
+[![Codeship Status for RichardKnop/go-mailchimp](https://codeship.com/projects/fdac3010-3acd-0134-e9c5-06456b66cf53/status?branch=master)](https://codeship.com/projects/166426)
 
 # Mailchimp
 
