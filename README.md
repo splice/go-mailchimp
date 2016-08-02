@@ -1,4 +1,4 @@
-[![Codeship Status for AreaHQ/go-mailchimp](https://codeship.com/projects/7252c9a0-09f0-0134-e361-2adbeb910e90/status?branch=master)](https://codeship.com/projects/155402)
+[![Codeship Status for RichardKnop/go-mailchimp](https://codeship.com/projects/7252c9a0-09f0-0134-e361-2adbeb910e90/status?branch=master)](https://codeship.com/projects/155402)
 
 # Mailchimp
 
@@ -12,7 +12,7 @@ package main
 import (
 	"log"
 
-	mailchimp "github.com/AreaHQ/go-mailchimp"
+	mailchimp "github.com/RichardKnop/go-mailchimp"
 )
 
 func main() {
@@ -38,12 +38,12 @@ func main() {
 		if err != nil {
 			// Check the error response
 			errResponse, ok := err.(*mailchimp.ErrorResponse)
-      
+
 			// Could not type assert error response
 			if !ok {
 				log.Fatal(err)
 			}
-      
+
 			log.Fatal(errResponse)
 		}
 
@@ -54,7 +54,7 @@ func main() {
 		)
 		return
 	}
-  
+
 	if err != nil {
 		// Check the error response
 		errResponse, ok := err.(*mailchimp.ErrorResponse)
@@ -77,16 +77,16 @@ func main() {
 		"john@reese.com",
 		map[string]interface{}{},
 	)
-  
+
 	if err != nil {
 		// Check the error response
 		errResponse, ok := err.(*mailchimp.ErrorResponse)
-    
+
 		// Could not type assert error response
 		if !ok {
 			log.Fatal(err)
 		}
-    
+
 		log.Fatal(errResponse)
 	}
 
