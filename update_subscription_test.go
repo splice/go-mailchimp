@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"testing"
 
-	mailchimp "github.com/RichardKnop/go-mailchimp"
-	"github.com/RichardKnop/go-mailchimp/status"
+	mailchimp "github.com/nhocki/go-mailchimp"
+	"github.com/nhocki/go-mailchimp/status"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -61,7 +61,7 @@ func TestUpdateSubscriptionMalformedError(t *testing.T) {
 	baseURL, _ := url.Parse("http://localhost/")
 	client.SetBaseURL(baseURL)
 
-	memberResponse, err := client.UpdateSubscription("list_id", "john@reese.com", map[string]interface{}{})
+	memberResponse, err := client.UpdateSubscription("list_id", "john@reese.com", "subscribed", map[string]interface{}{})
 	assert.Nil(t, memberResponse)
 	assert.Equal(t, "unexpected end of JSON input", err.Error())
 }

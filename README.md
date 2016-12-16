@@ -12,7 +12,7 @@ package main
 import (
 	"log"
 
-	mailchimp "github.com/RichardKnop/go-mailchimp"
+	mailchimp "github.com/nhocki/go-mailchimp"
 )
 
 func main() {
@@ -32,6 +32,7 @@ func main() {
 		memberResponse, err = client.UpdateSubscription(
 			"listID",
 			"john@reese.com",
+			"subscribed",
 			map[string]interface{}{},
 		)
 
