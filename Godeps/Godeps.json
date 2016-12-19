@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/nhocki/go-mailchimp",
+	"ImportPath": "github.com/splicers/go-mailchimp",
 	"GoVersion": "go1.6",
 	"GodepVersion": "v74",
 	"Packages": [

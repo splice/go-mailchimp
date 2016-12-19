@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/nhocki/go-mailchimp/status"
+	"github.com/splicers/go-mailchimp/status"
 )
 
 // Subscribe ...
