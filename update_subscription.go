@@ -5,22 +5,36 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+
+	"github.com/splicers/go-mailchimp/status"
 )
 
-// UpdateSubscription ...
-func (c *Client) UpdateSubscription(listID string, email string, status string, mergeFields map[string]interface{}) (*MemberResponse, error) {
-	// Hash email
+// UpdateSubscription will update the subscription identified by `email` in
+// the list with ID `listID`. You can send any parameters from the ones that
+// are documented in Mailchimps docs.
+//
+// http://developer.mailchimp.com/documentation/mailchimp/reference/lists/members/#edit-put_lists_list_id_members_subscriber_hash
+func (c *Client) UpdateSubscription(listID, email string, params map[string]interface{}) (*MemberResponse, error) {
+	// Mailchimp uses the MD5 of the email as the subscription's key.
 	emailMD5 := fmt.Sprintf("%x", md5.Sum([]byte(email)))
-	// Make request
-	params := map[string]interface{}{
+
+	// Default parameters for subscriptions. If nothing is sent, at least set
+	// the user as subscribed.
+	reqParams := map[string]interface{}{
 		"email_address": email,
-		"status":        status,
-		"merge_fields":  mergeFields,
+		"status":        status.Subscribed,
+		"status_if_new": status.Subscribed,
 	}
+
+	// Override default parameters with whatever was sent in `params` argument.
+	for k, v := range params {
+		reqParams[k] = v
+	}
+
 	resp, err := c.do(
 		"PUT",
 		fmt.Sprintf("/lists/%s/members/%s", listID, emailMD5),
-		&params,
+		&reqParams,
 	)
 	if err != nil {
 		return nil, err
