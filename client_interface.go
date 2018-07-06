@@ -4,12 +4,14 @@ import (
 	"net/url"
 )
 
-// ClientInterface defines exported methods
+// ClientInterface defines the interface needed to integrate with Mailchimps
+// API V3.0.
 type ClientInterface interface {
 	// Exported methods
 	CheckSubscription(listID string, email string) (*MemberResponse, error)
 	Subscribe(listID string, email string, mergeFields map[string]interface{}) (*MemberResponse, error)
 	UpdateSubscription(listID string, email string, status string, mergeFields map[string]interface{}) (*MemberResponse, error)
+	RawUpdateSubscription(listID, email string, params map[string]interface{}) (*MemberResponse, error)
 	SetBaseURL(baseURL *url.URL)
 	GetBaseURL() *url.URL
 }
