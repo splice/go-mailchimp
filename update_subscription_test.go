@@ -1,6 +1,7 @@
 package mailchimp_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -61,13 +62,25 @@ func TestUpdateSubscriptionMalformedError(t *testing.T) {
 	baseURL, _ := url.Parse("http://localhost/")
 	client.SetBaseURL(baseURL)
 
-	memberResponse, err := client.UpdateSubscription("list_id", "john@reese.com", "subscribed", map[string]interface{}{})
+	memberResponse, err := client.UpdateSubscription("list_id", "john@reese.com", map[string]interface{}{})
 	assert.Nil(t, memberResponse)
 	assert.Equal(t, "unexpected end of JSON input", err.Error())
 }
 
 func TestUpdateSubscription(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		var pld struct {
+			Email  string `json:"email_address"`
+			Status string `json:"status"`
+		}
+		decoder := json.NewDecoder(req.Body)
+		defer req.Body.Close()
+		assert.NoError(t, decoder.Decode(&pld))
+
+		// Test that we can override the email but there are some default attributes.
+		assert.Equal(t, "another@email.com", pld.Email)
+		assert.Equal(t, status.Subscribed, pld.Status)
+
 		rw.WriteHeader(200)
 		rw.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(rw, successResponse)
@@ -86,10 +99,9 @@ func TestUpdateSubscription(t *testing.T) {
 	baseURL, _ := url.Parse("http://localhost/")
 	client.SetBaseURL(baseURL)
 
-	memberResponse, err := client.Subscribe("list_id", "john@reese.com", map[string]interface{}{})
+	memberResponse, err := client.UpdateSubscription("list_id", "john@reese.com", map[string]interface{}{
+		"email_address": "another@email.com",
+	})
 	assert.NoError(t, err)
-
 	assert.Equal(t, "11bf13d1eb58116eba1de370b2bd796b", memberResponse.ID)
-	assert.Equal(t, "john@reese.com", memberResponse.EmailAddress)
-	assert.Equal(t, status.Subscribed, memberResponse.Status)
 }
